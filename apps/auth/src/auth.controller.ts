@@ -5,7 +5,7 @@ import { LocalAuthGuad } from './guards/local-auth.guard';
 import { CurrentUser } from './users/current-user.decorator';
 import { UserDocument } from './users/models/users.schema';
 
-@Controller()
+@Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
