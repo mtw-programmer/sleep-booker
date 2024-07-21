@@ -54,5 +54,6 @@ import { AUTH_SERVICE, PAYMENTS_SERVICE } from '@app/common';
   ],
   controllers: [ReservationsController],
   providers: [ReservationsService, ReservationsRepository],
+  exports: [ReservationsService]
 })
 export class ReservationsModule {}

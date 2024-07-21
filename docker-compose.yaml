@@ -32,7 +32,7 @@ services:
     env_file:
       - ./apps/payments/.env
     ports:
-      - '3003:3003'
+      - '3004:3004'
     volumes:
       - .:/usr/src/app
   mongo:
