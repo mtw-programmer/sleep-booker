@@ -46,7 +46,7 @@ export class PaymentsService {
     switch(event.type) {
       case 'payment_intent.succeeded':
         const paymentIntentSucceeded = event.data.object;
-        const updatedReservation = await this.reservationsService.update(paymentIntentSucceeded.id, { confirmed: true });
+        const updatedReservation = await this.reservationsService.updateByInvoiceId(paymentIntentSucceeded.id, { confirmed: true });
         return updatedReservation;
       default:
         this.logger.warn('Stripe webhook unhandled event type', event);

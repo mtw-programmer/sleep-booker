@@ -50,6 +50,12 @@ export class ReservationsService {
       $set: updateReservationDto
     });
   }
+  
+  async updateByInvoiceId(invoiceId: string, updateReservationDto: UpdateReservationDto) {
+    return this.reservationsRepository.findOneAndUpdate({ invoiceId }, {
+      $set: updateReservationDto
+    });
+  }
 
   async remove(_id: string) {
     return this.reservationsRepository.findOneAndDelete({ _id });
