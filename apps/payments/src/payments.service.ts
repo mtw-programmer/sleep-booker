@@ -1,8 +1,10 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
-import { CreateChargeDto, PaymentIntentResponseDto } from '@app/common';
+import { NOTIFICATIONS_SERVICE } from '@app/common';
 import { ReservationsService } from 'apps/reservations/src/reservations.service';
+import { ClientProxy } from '@nestjs/microservices';
+import { PaymentsCreateChargeDto } from './dto/payments-create-charge.dto';
 
 @Injectable()
 export class PaymentsService {
@@ -17,11 +19,12 @@ export class PaymentsService {
 
   constructor(
     private readonly configService: ConfigService,
-    private reservationsService: ReservationsService
+    private reservationsService: ReservationsService,
+    @Inject(NOTIFICATIONS_SERVICE) private readonly notificationsService: ClientProxy
   ) {}
 
   async createCharge(
-    { amount }: CreateChargeDto
+    { amount, email }: PaymentsCreateChargeDto
   ): Promise<Stripe.Response<Stripe.PaymentIntent>> {
     const paymentIntent = await this.stripe.paymentIntents.create({
       amount,
@@ -29,6 +32,8 @@ export class PaymentsService {
     });
 
     this.logger.log('Created new payment intent', paymentIntent);
+
+    this.notificationsService.emit('notify_email', { email });
 
     return paymentIntent;
   }
