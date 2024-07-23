@@ -21,14 +21,15 @@ export class ReservationsService {
         email
       })
       .pipe(
-        map((res) => {
-          return this.reservationsRepository.create({
+        map(async (res) => {
+          const reservation = await this.reservationsRepository.create({
             ...createReservationDto,
             invoiceId: res.id,
             timestamp: new Date(),
             userId: _id,
             confirmed: false,
           });
+          return { reservation, paymentIntent: res }
         }),
       );
     } catch (error) {
