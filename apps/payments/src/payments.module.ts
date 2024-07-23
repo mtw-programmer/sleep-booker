@@ -6,6 +6,7 @@ import * as Joi from 'joi';
 import { LoggerModule, NOTIFICATIONS_SERVICE } from '@app/common';
 import { ReservationsModule } from 'apps/reservations/src/reservations.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { UsersModule } from 'apps/auth/src/users/users.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     }),
     LoggerModule,
     ReservationsModule,
+    UsersModule,
     ClientsModule.registerAsync([
       {
         name: NOTIFICATIONS_SERVICE,

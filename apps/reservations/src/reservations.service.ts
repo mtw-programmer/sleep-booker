@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { ReservationsRepository } from './reservations.repository';
@@ -8,6 +8,8 @@ import { map } from 'rxjs';
 
 @Injectable()
 export class ReservationsService {
+  private readonly logger = new Logger(ReservationsService.name);
+
   constructor(
     private readonly reservationsRepository: ReservationsRepository,
     @Inject(PAYMENTS_SERVICE) private readonly paymentsService: ClientProxy,
@@ -33,7 +35,7 @@ export class ReservationsService {
         }),
       );
     } catch (error) {
-      console.error('Error creating reservation:', error);
+      this.logger.error('Error creating reservation', error);
       throw error;
     }
   }

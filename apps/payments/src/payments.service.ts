@@ -5,6 +5,7 @@ import { NOTIFICATIONS_SERVICE } from '@app/common';
 import { ReservationsService } from 'apps/reservations/src/reservations.service';
 import { ClientProxy } from '@nestjs/microservices';
 import { PaymentsCreateChargeDto } from './dto/payments-create-charge.dto';
+import { UsersService } from 'apps/auth/src/users/users.service';
 
 @Injectable()
 export class PaymentsService {
@@ -20,6 +21,7 @@ export class PaymentsService {
   constructor(
     private readonly configService: ConfigService,
     private reservationsService: ReservationsService,
+    private usersService: UsersService,
     @Inject(NOTIFICATIONS_SERVICE) private readonly notificationsService: ClientProxy
   ) {}
 
@@ -33,7 +35,10 @@ export class PaymentsService {
 
     this.logger.log('Created new payment intent', paymentIntent);
 
-    this.notificationsService.emit('notify_email', { email });
+    this.notificationsService.emit('notify_email', {
+      email,
+      text: `Your payment intent of price $${(amount / 100).toFixed(2)} has been created successfully. Confirm the payment to finish your reservation.`
+    });
 
     return paymentIntent;
   }
@@ -52,6 +57,12 @@ export class PaymentsService {
       case 'payment_intent.succeeded':
         const paymentIntentSucceeded = event.data.object;
         const updatedReservation = await this.reservationsService.updateByInvoiceId(paymentIntentSucceeded.id, { confirmed: true });
+        const userId = updatedReservation.userId;
+        const { email } = await this.usersService.getUser({ _id: userId });
+        this.notificationsService.emit('notify_email', {
+          email,
+          text: 'Your reservation has been successfully confirmed.'
+        });
         return updatedReservation;
       default:
         this.logger.warn('Stripe webhook unhandled event type', event);
